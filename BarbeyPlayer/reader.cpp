@@ -37,7 +37,14 @@ bool Reader::Initialize(Config &config)
 
     InitFreePixBlocks();
 
+    if (!m_config.fileName.isEmpty())
+    {
+        OpenFile(m_config.fileName);
 
+        qInfo() << "Reader::Initialize: open file" << m_config.fileName;
+    }
+
+    start();
 
     return true;
 
@@ -46,13 +53,28 @@ bool Reader::Initialize(Config &config)
 void Reader::OpenFile(QString &fileName)
 {
     m_file.setFileName(m_config.fileName);
-    m_file.open(QIODevice::ReadOnly);
+//    m_file.open(QIODevice::ReadOnly);
 
 }
 
 void Reader::Play()
 {
-    start();
+    if (!m_file.fileName().isEmpty() && !m_file.isOpen())
+    {
+        m_file.open(QIODevice::ReadOnly);
+    }
+
+    m_bPlay = true;
+}
+
+void Reader::Pause()
+{
+    m_bPlay = false;
+}
+
+void Reader::Stop()
+{
+    m_file.close();
 }
 
 void Reader::run()
@@ -123,8 +145,18 @@ Reader::PixBlock* Reader::GetFilledPixBlock()
 
 void Reader::ReadFile()
 {
-    if (!m_file.isOpen())
+    if (!m_bPlay)
+    {
         return;
+    }
+
+    if (!m_file.isOpen())
+    {
+        qInfo() << "Reader::ReadFile: file is not open";
+        return;
+    }
+
+//    qInfo() << "Reader::ReadFile";
 
     const int blocksize = m_config.blocksize;
     PixBlock *pixblock = GetFreePixBlock();

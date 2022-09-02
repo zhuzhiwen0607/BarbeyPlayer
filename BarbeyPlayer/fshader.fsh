@@ -1,10 +1,11 @@
-//uniform sampler2D qt_Texture0;
-//varying highp vec4 qt_TexCoord0;
-
 #version 330 core
 in vec4 otex;
 uniform sampler2D textureY;
 uniform sampler2D textureUV;
+
+
+//varying mediump vec4 otex;
+
 
 void main(void)
 {

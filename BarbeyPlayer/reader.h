@@ -72,6 +72,8 @@ private:
     QVector<PixBlock*> m_freePixBlocks;
     QVector<PixBlock*> m_filledPixBlocks;
 
+    bool m_bPlay = false;
+
 
 };
 

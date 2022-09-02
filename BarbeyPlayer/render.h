@@ -19,11 +19,11 @@ public:
 
 
 public:
-    explicit Render();
+    explicit Render(QWidget *parent = nullptr);
     ~Render();
     bool Initialize(Config &config, Reader *reader = nullptr);
 
-
+    void PixImageTest();
 
 
 signals:
@@ -44,6 +44,7 @@ private:
 
     QOpenGLShaderProgram m_shaderProgram;
     GLuint m_vbo[2];
+    GLuint m_samples[2];    // nv12
     GLuint m_textures[2];
 
 };
