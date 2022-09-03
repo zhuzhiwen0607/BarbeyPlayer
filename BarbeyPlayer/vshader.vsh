@@ -1,10 +1,10 @@
-#version 330 core
-layout (location = 0) in vec2 ipos;
-layout (location = 1) in vec2 itex;
-out vec4 otex;
-//attribute vec2 ipos;
-//attribute vec2 itex;
-//varying vec4 otex;
+//#version 330 core
+//layout (location = 0) in vec2 ipos;
+//layout (location = 1) in vec2 itex;
+//out vec4 otex;
+attribute vec2 ipos;
+attribute vec2 itex;
+varying vec4 otex;
 
 void main()
 {

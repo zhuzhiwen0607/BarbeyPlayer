@@ -18,7 +18,7 @@ public:
 //        qint32 height;
         int blocksize;
 //        int blocknum;
-        QString fileName;
+//        QString fileName;
 
     };
 

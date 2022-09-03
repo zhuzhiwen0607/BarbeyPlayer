@@ -1,10 +1,10 @@
-#version 330 core
-in vec4 otex;
+//#version 330 core
+//in vec4 otex;
 uniform sampler2D textureY;
 uniform sampler2D textureUV;
 
 
-//varying mediump vec4 otex;
+varying mediump vec4 otex;
 
 
 void main(void)

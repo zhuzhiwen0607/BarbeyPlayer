@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_pReader = new Reader;
     Reader::Config readerConfig = { };
     readerConfig.blocksize = 1920 * 1080 * 3 / 2;
-    readerConfig.fileName = "D:\\Projects\\testmedia\\Bumblebee-20s.yuv";
+//    readerConfig.fileName = "D:\\Projects\\testmedia\\Bumblebee-20s.yuv";
     m_pReader->Initialize(readerConfig);
 
 //    m_pRender = new Render(m_pDisplayWidget);

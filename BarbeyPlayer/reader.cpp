@@ -37,14 +37,14 @@ bool Reader::Initialize(Config &config)
 
     InitFreePixBlocks();
 
-    if (!m_config.fileName.isEmpty())
-    {
-        OpenFile(m_config.fileName);
+//    if (!m_config.fileName.isEmpty())
+//    {
+//        OpenFile(m_config.fileName);
 
-        qInfo() << "Reader::Initialize: open file" << m_config.fileName;
-    }
+//        qInfo() << "Reader::Initialize: open file" << m_config.fileName;
+//    }
 
-    start();
+//    start();
 
     return true;
 
@@ -52,8 +52,12 @@ bool Reader::Initialize(Config &config)
 
 void Reader::OpenFile(QString &fileName)
 {
-    m_file.setFileName(m_config.fileName);
-//    m_file.open(QIODevice::ReadOnly);
+    m_file.setFileName(fileName);
+    m_file.open(QIODevice::ReadOnly);
+
+    start();
+
+    Play(); // play video immediately
 
 }
 
@@ -74,6 +78,10 @@ void Reader::Pause()
 
 void Reader::Stop()
 {
+//    quit();
+//    wait();
+    m_bPlay = false;
+
     m_file.close();
 }
 
@@ -145,16 +153,17 @@ Reader::PixBlock* Reader::GetFilledPixBlock()
 
 void Reader::ReadFile()
 {
+    qInfo() << "m_bPlay =" << m_bPlay;
     if (!m_bPlay)
     {
         return;
     }
 
-    if (!m_file.isOpen())
-    {
-        qInfo() << "Reader::ReadFile: file is not open";
-        return;
-    }
+//    if (!m_file.isOpen())
+//    {
+//        qInfo() << "Reader::ReadFile: file is not open";
+//        return;
+//    }
 
 //    qInfo() << "Reader::ReadFile";
 

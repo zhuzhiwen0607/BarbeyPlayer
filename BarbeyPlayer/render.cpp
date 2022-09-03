@@ -2,7 +2,7 @@
 
 #define VERTEX_POS 0
 #define VERTEX_TEX 1
-
+/*
 const char *vsrc =
         "attribute vec4 vertexIn; \
          attribute vec4 textureIn; \
@@ -29,7 +29,7 @@ const char *fsrc =
                      "1.596, -0.813,  0.0) * yuv; \n"
          "gl_FragColor = vec4(rgb, 1); \n"
          "}\n";
-
+*/
 
 Render::Render(QWidget *parent) : QOpenGLWidget(parent)
 {
@@ -84,8 +84,8 @@ void Render::initializeGL()
 //    m_shaderProgram.addShaderFromSourceCode(QOpenGLShader::Vertex, vsrc);
 //    m_shaderProgram.addShaderFromSourceCode(QOpenGLShader::Fragment, fsrc);
 
-//    m_shaderProgram.bindAttributeLocation("ipos", VERTEX_POS);
-//    m_shaderProgram.bindAttributeLocation("itex", VERTEX_TEX);
+    m_shaderProgram.bindAttributeLocation("ipos", VERTEX_POS);
+    m_shaderProgram.bindAttributeLocation("itex", VERTEX_TEX);
     m_shaderProgram.link();
     m_shaderProgram.bind();
 
