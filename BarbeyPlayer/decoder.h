@@ -15,7 +15,7 @@ extern "C"
 class Decoder : public QThread
 {
     Q_OBJECT
-
+public:
     struct Config
     {
         QString filename;
@@ -39,6 +39,7 @@ public:
 signals:
 
 public slots:
+    void OnOpen(QString);
     void OnStart();
     void OnStop();
     void OnPlay();
@@ -52,7 +53,9 @@ protected:
     void InitFreeAudioFrames(const int n);
 
 private:
-    Config m_config;
+    Config m_config = { };
+    bool m_runPlay = false;
+
     AVFormatContext *m_pFormatContext = nullptr;
     StreamContext *m_pStreamContext = nullptr;
     AVPacket *m_pPacket = nullptr;
@@ -62,6 +65,8 @@ private:
 
     QMutex m_audioMutex;
     QVector<AVFrame*> m_freeAudioFrames;
+
+
 };
 
 #endif // DECODER_H

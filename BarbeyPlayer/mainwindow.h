@@ -6,6 +6,7 @@
 #include <QSlider>
 //#include <QLayout>
 #include "render.h"
+#include "decoder.h"
 #include "displaywidget.h"
 
 
@@ -54,7 +55,7 @@ private:
     QSlider *m_pVolumeSlider = nullptr;
     QSlider *m_pProgressSlider = nullptr;
 
-
+    Decoder *m_pDecoder = nullptr;
     Reader *m_pReader = nullptr;
     Render *m_pRender = nullptr;
 

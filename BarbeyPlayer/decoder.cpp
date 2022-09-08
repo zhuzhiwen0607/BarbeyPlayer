@@ -14,23 +14,33 @@ Decoder::~Decoder()
 bool Decoder::Initialize(Config &config)
 {
     m_config = config;
-    int ret;
+
 
     moveToThread(this);
 
-    const char *inputFileName = config.filename.toStdString().c_str();
+    start();
+
+    return true;
+}
+
+void Decoder::OnOpen(QString filename)
+{
+    int ret;
+
+//    const char *inputFileName = m_config.filename.toStdString().c_str();
+    const char *inputFileName = filename.toStdString().c_str();
     ret = avformat_open_input(&m_pFormatContext, inputFileName, NULL, NULL);
     if (ret < 0)
     {
         qWarning() << "avformat_open_input error, ret =" << ret;
-        return false;
+        return;
     }
 
     ret = avformat_find_stream_info(m_pFormatContext, NULL);
     if (ret < 0)
     {
         qWarning() << "avformat_find_stream_info error, ret =" << ret;
-        return false;
+        return;
     }
 
 //    const int nStreams = m_pFormatContext->nb_streams;
@@ -48,14 +58,14 @@ bool Decoder::Initialize(Config &config)
         if (!pCodec)
         {
             qWarning() << QString::asprintf("streams[%d]: avcodec_alloc_context3 error", i);
-            return false;
+            return;
         }
 
         ret = avcodec_parameters_to_context(pCodecContext, pStream->codecpar);
         if (ret < 0)
         {
             qWarning() << QString::asprintf("streams[%d]: avcodec_parameters_to_context error, %d", i, ret);
-            return false;
+            return;
         }
 
         qDebug() << QString::asprintf("streams[%d]: codecType=%d", pCodecContext->codec_type);
@@ -64,7 +74,7 @@ bool Decoder::Initialize(Config &config)
         if (ret < 0)
         {
             qWarning() << QString::asprintf("streams[%d]: avcodec_open2 error, %d", i, ret);
-            return false;
+            return;
         }
 
         m_pStreamContext[i].decCtx = pCodecContext;
@@ -77,9 +87,6 @@ bool Decoder::Initialize(Config &config)
 
     av_dump_format(m_pFormatContext, 0, inputFileName, 0);
 
-    start();
-
-    return true;
 }
 
 void Decoder::OnStart()
@@ -94,19 +101,21 @@ void Decoder::OnStop()
 
 void Decoder::OnPlay()
 {
-
+    m_runPlay = true;
 }
 
 void Decoder::OnPause()
 {
-
+    m_runPlay = false;
 }
 
 void Decoder::run()
 {
     while (true)
     {
-        DecodeLoop();
+        if (m_runPlay)
+            DecodeLoop();
+
         msleep(10);
     }
 }

@@ -20,11 +20,20 @@ MainWindow::MainWindow(QWidget *parent)
 //    m_pDisplayWidget = new DisplayWidget(this);
 
 
+
+
+#if 0
     m_pReader = new Reader;
     Reader::Config readerConfig = { };
     readerConfig.blocksize = 1920 * 1080 * 3 / 2;
 //    readerConfig.fileName = "D:\\Projects\\testmedia\\Bumblebee-20s.yuv";
     m_pReader->Initialize(readerConfig);
+#endif
+
+    m_pDecoder = new Decoder;
+    Decoder::Config decoderConfig = { };
+    m_pDecoder->Initialize(decoderConfig);
+
 
 //    m_pRender = new Render(m_pDisplayWidget);
     m_pRender = new Render(this);
@@ -63,7 +72,8 @@ void MainWindow::OnFileOpen()
     if (fileName.isEmpty())
         return;
 
-    m_pReader->OpenFile(fileName);
+//    m_pReader->OpenFile(fileName);
+    m_pDecoder->OnOpen(fileName);
 
 }
 
@@ -74,17 +84,20 @@ void MainWindow::OnAppExit()
 
 void MainWindow::OnPlay()
 {
-    m_pReader->Play();
+//    m_pReader->Play();
+    m_pDecoder->OnPlay();
 }
 
 void MainWindow::OnPause()
 {
-    m_pReader->Pause();
+//    m_pReader->Pause();
+    m_pDecoder->OnPause();
 }
 
 void MainWindow::OnStop()
 {
-    m_pReader->Stop();
+//    m_pReader->Stop();
+    m_pDecoder->OnStop();
 }
 
 void MainWindow::OnChangeVolume()
