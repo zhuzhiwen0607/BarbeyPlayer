@@ -1,0 +1,14 @@
+prefix=C:msys64homeadminhsr-ffmpegThirdPartyffmpeg
+exec_prefix=${prefix}
+libdir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeglibwinx64
+includedir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeginclude
+
+Name: libswresample
+Description: FFmpeg audio resampling library
+Version: 4.0.100
+Requires: 
+Requires.private: libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lswresample 
+Libs.private: 
+Cflags: -I${includedir}

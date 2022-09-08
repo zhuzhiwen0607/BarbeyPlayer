@@ -1,0 +1,14 @@
+prefix=E:SimplestH264StreamDecodethirdpartffmpeg
+exec_prefix=${prefix}
+libdir=E:SimplestH264StreamDecodethirdpartffmpeglibx86
+includedir=E:SimplestH264StreamDecodethirdpartffmpeginclude
+
+Name: libswresample
+Description: FFmpeg audio resampling library
+Version: 4.0.100
+Requires: 
+Requires.private: libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lswresample 
+Libs.private: 
+Cflags: -I${includedir}

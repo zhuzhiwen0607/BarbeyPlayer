@@ -1,0 +1,14 @@
+prefix=C:msys64homeadminhsr-ffmpegThirdPartyffmpeg
+exec_prefix=${prefix}
+libdir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeglibwinx64
+includedir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeginclude
+
+Name: libpostproc
+Description: FFmpeg postprocessing library
+Version: 56.0.100
+Requires: 
+Requires.private: libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lpostproc 
+Libs.private: 
+Cflags: -I${includedir}

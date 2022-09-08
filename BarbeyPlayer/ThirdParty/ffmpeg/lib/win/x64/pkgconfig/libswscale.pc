@@ -1,0 +1,14 @@
+prefix=C:msys64homeadminhsr-ffmpegThirdPartyffmpeg
+exec_prefix=${prefix}
+libdir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeglibwinx64
+includedir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeginclude
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 6.1.100
+Requires: 
+Requires.private: libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lswscale 
+Libs.private: 
+Cflags: -I${includedir}

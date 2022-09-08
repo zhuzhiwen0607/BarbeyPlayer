@@ -1,0 +1,1 @@
+FFPlay.exe  -f f32le -ar 44100 -ac 2 "C:\Users\Public\temp\test.pcm"

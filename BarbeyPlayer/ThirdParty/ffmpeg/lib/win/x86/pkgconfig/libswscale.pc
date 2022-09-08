@@ -1,0 +1,14 @@
+prefix=E:SimplestH264StreamDecodethirdpartffmpeg
+exec_prefix=${prefix}
+libdir=E:SimplestH264StreamDecodethirdpartffmpeglibx86
+includedir=E:SimplestH264StreamDecodethirdpartffmpeginclude
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 6.1.100
+Requires: 
+Requires.private: libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lswscale 
+Libs.private: 
+Cflags: -I${includedir}

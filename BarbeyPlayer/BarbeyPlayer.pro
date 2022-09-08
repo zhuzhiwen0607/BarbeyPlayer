@@ -1,6 +1,10 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets openglwidgets opengl
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+macx {
+    QT += openglwidgets opengl
+}
 
 CONFIG += c++17
 
@@ -9,18 +13,34 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    decoder.cpp \
     main.cpp \
     mainwindow.cpp \
     reader.cpp \
     render.cpp
 
 HEADERS += \
+    decoder.h \
     mainwindow.h \
     reader.h \
     render.h
 
 FORMS += \
     mainwindow.ui
+
+win32 {
+    INCLUDEPATH += "$${PWD}/ThirdParty/ffmpeg/include"
+
+    FFMPEG_LIB_PATH = "$${PWD}/ThirdParty/ffmpeg/lib/win/x64"
+
+    LIBS += "$${FFMPEG_LIB_PATH}/avcodec.lib" \
+            "$${FFMPEG_LIB_PATH}/avdevice.lib" \
+            "$${FFMPEG_LIB_PATH}/avfilter.lib" \
+            "$${FFMPEG_LIB_PATH}/avformat.lib" \
+            "$${FFMPEG_LIB_PATH}/avutil.lib" \
+            "$${FFMPEG_LIB_PATH}/swresample.lib" \
+            "$${FFMPEG_LIB_PATH}/swscale.lib"
+}
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

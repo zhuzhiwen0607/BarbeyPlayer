@@ -1,0 +1,14 @@
+prefix=E:SimplestH264StreamDecodethirdpartffmpeg
+exec_prefix=${prefix}
+libdir=E:SimplestH264StreamDecodethirdpartffmpeglibx86
+includedir=E:SimplestH264StreamDecodethirdpartffmpeginclude
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 57.9.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: user32.lib bcrypt.lib
+Cflags: -I${includedir}

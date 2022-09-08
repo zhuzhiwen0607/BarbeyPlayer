@@ -1,0 +1,14 @@
+prefix=C:msys64homeadminhsr-ffmpegThirdPartyffmpeg
+exec_prefix=${prefix}
+libdir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeglibwinx64
+includedir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeginclude
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 8.17.100
+Requires: 
+Requires.private: libswscale >= 6.1.100, libpostproc >= 56.0.100, libavformat >= 59.9.101, libavcodec >= 59.13.100, libswresample >= 4.0.100, libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lavfilter 
+Libs.private: libmfx.lib advapi32.lib
+Cflags: -I${includedir}

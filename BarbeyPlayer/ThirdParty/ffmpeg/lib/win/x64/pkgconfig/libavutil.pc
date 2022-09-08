@@ -1,0 +1,14 @@
+prefix=C:msys64homeadminhsr-ffmpegThirdPartyffmpeg
+exec_prefix=${prefix}
+libdir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeglibwinx64
+includedir=C:msys64homeadminhsr-ffmpegThirdPartyffmpeginclude
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 57.9.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: libmfx.lib advapi32.lib user32.lib bcrypt.lib
+Cflags: -I${includedir}

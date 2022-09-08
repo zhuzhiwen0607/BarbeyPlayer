@@ -1,0 +1,14 @@
+prefix=E:SimplestH264StreamDecodethirdpartffmpeg
+exec_prefix=${prefix}
+libdir=E:SimplestH264StreamDecodethirdpartffmpeglibx86
+includedir=E:SimplestH264StreamDecodethirdpartffmpeginclude
+
+Name: libavdevice
+Description: FFmpeg device handling library
+Version: 59.0.101
+Requires: 
+Requires.private: libavfilter >= 8.17.100, libswscale >= 6.1.100, libavformat >= 59.9.101, libavcodec >= 59.13.100, libswresample >= 4.0.100, libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lavdevice 
+Libs.private: psapi.lib ole32.lib strmiids.lib uuid.lib oleaut32.lib shlwapi.lib gdi32.lib vfw32.lib
+Cflags: -I${includedir}

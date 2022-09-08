@@ -1,0 +1,14 @@
+prefix=E:SimplestH264StreamDecodethirdpartffmpeg
+exec_prefix=${prefix}
+libdir=E:SimplestH264StreamDecodethirdpartffmpeglibx86
+includedir=E:SimplestH264StreamDecodethirdpartffmpeginclude
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 8.17.100
+Requires: 
+Requires.private: libswscale >= 6.1.100, libavformat >= 59.9.101, libavcodec >= 59.13.100, libswresample >= 4.0.100, libavutil >= 57.9.100
+Conflicts:
+Libs: -L${libdir}  -lavfilter 
+Libs.private: 
+Cflags: -I${includedir}
