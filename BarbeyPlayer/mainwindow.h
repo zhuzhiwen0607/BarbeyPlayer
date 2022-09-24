@@ -6,6 +6,7 @@
 #include <QSlider>
 //#include <QLayout>
 #include "render.h"
+#include "display.h"
 #include "decoder.h"
 #include "displaywidget.h"
 
@@ -58,6 +59,7 @@ private:
     Decoder *m_pDecoder = nullptr;
     Reader *m_pReader = nullptr;
     Render *m_pRender = nullptr;
+    Display *m_pDisplay = nullptr;
 
 };
 #endif // MAINWINDOW_H

@@ -14,6 +14,7 @@ CONFIG += c++17
 
 SOURCES += \
     decoder.cpp \
+    display.cpp \
     main.cpp \
     mainwindow.cpp \
     reader.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     decoder.h \
+    display.h \
     mainwindow.h \
     reader.h \
     render.h

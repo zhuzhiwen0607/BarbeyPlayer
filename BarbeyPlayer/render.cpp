@@ -35,11 +35,16 @@ Render::Render(QWidget *parent) : QOpenGLWidget(parent)
 {
     memset(&m_config, 0, sizeof(m_config));
     m_pReader = nullptr;
+    m_pDecoder = nullptr;
 }
 
 Render::~Render()
 {
-    disconnect(m_pReader, &Reader::sigNewFrame, this, &Render::OnNewFrame);
+    if (m_pReader)
+        disconnect(m_pReader, &Reader::sigNewFrame, this, &Render::OnNewFrame);
+
+    if (m_pDecoder)
+        disconnect(m_pDecoder, &Decoder::sigNewFrame, this, &Render::OnNewFrame);
 }
 
 bool Render::Initialize(Config &config, Reader *reader)
@@ -50,7 +55,30 @@ bool Render::Initialize(Config &config, Reader *reader)
     memset(m_samples, 0, sizeof(m_samples));
     memset(m_textures, 0, sizeof(m_textures));
 
-    connect(m_pReader, &Reader::sigNewFrame, this, &Render::OnNewFrame);
+//    connect(m_pReader, &Reader::sigNewFrame, this, &Render::OnNewFrame);
+
+    qInfo() << "finish Render::Initialize";
+
+    return true;
+}
+
+bool Render::Initialize(Config &config, Decoder *decoder)
+{
+    if (!decoder)
+    {
+        qWarning() << "Render::Initialize: decoder is null";
+        return false;
+    }
+
+    m_config = config;
+//    m_pReader = reader;
+    m_pDecoder = decoder;
+    memset(m_vbo, 0, sizeof(m_vbo));
+    memset(m_samples, 0, sizeof(m_samples));
+    memset(m_textures, 0, sizeof(m_textures));
+
+//    connect(m_pReader, &Reader::sigNewFrame, this, &Render::OnNewFrame);
+    connect(decoder, &Decoder::sigNewFrame, this, &Render::OnNewFrame);
 
     qInfo() << "finish Render::Initialize";
 
@@ -146,6 +174,79 @@ void Render::paintGL()
 
 //    qInfo() << "Render::paintGL";
 
+//    Reader::PixBlock *pixblock = m_pReader->GetFilledPixBlock();    // NV12
+//    if (!pixblock)
+//    {
+//        qInfo() << "Render::paintGL: GetFilledPixBlock return null";
+//        return;
+//    }
+    AVFrame *pFrame = m_pDecoder->GetFilledVideoFrame();
+    if (!pFrame)
+        return;
+
+    static QByteArray data;
+    int width = pFrame->width;
+    int height = pFrame->height;
+    int size = av_image_get_buffer_size((AVPixelFormat)pFrame->format, width, height, 1);
+    data.resize(size);
+    av_image_copy_to_buffer((uint8_t*)data.data(), size, pFrame->data, pFrame->linesize, (AVPixelFormat)pFrame->format, width, height, 1);
+
+//    const char *y = pixblock->data;
+//    const char *uv = y + m_config.width * m_config.height;
+//    int width = pFrame->width;
+//    int height = pFrame->height;
+
+
+//    const char *y = pFrame->data;
+//    const char *uv = pFrame->data + width * height;
+
+//    const int sizeY = m_config.width * m_config.height;
+//    const int sizeUV = m_config.width * m_config.height / 2;
+
+
+//    char *dataY = new char[sizeY];
+//    memset(dataY, 0, sizeY);
+//    memcpy(dataY, y, sizeY);
+
+//    char *dataUV = new char[sizeUV];
+//    memset(dataUV, 0, sizeUV);
+//    memcpy(dataUV, uv, sizeUV);
+
+//    qInfo() << QString::asprintf("paintGL: width=%d, height=%d", m_config.width, m_config.height);
+
+//    glUseProgram(m_shaderProgram);
+
+    char *dataY = data.data();
+    char *dataUV = data.data() + width * height;
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, dataY);
+    glUniform1i(m_samples[0], 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_textures[1]);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width >> 1, height >> 1, GL_RG, GL_UNSIGNED_BYTE, dataUV);
+    glUniform1i(m_samples[1], 1);
+
+//    glActiveTexture(GL_TEXTURE2);
+//    glBindTexture(GL_TEXTURE_2D, m_textures[2]);
+//    glTexSubImage2D(GL_TEXTURE2, 0, 0, 0, m_config.width >> 1, m_config.height >> 1, GL_RED, GL_UNSIGNED_BYTE, v);
+//    glUniform1i(m_samples[2], 2);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+//    m_pReader->FreePixBlock(pixblock);
+    m_pDecoder->FreeVideoFrame(pFrame);
+
+}
+
+/*
+void Render::paintGL()
+{
+
+//    qInfo() << "Render::paintGL";
+
     Reader::PixBlock *pixblock = m_pReader->GetFilledPixBlock();    // NV12
     if (!pixblock)
     {
@@ -168,7 +269,7 @@ void Render::paintGL()
     memcpy(dataUV, uv, sizeUV);
 
 
-    /*
+    #if 0
     static bool writeflag = false;
     if (!writeflag)
     {
@@ -180,7 +281,7 @@ void Render::paintGL()
 
         writeflag = true;
     }
-    */
+    #endif
 
 //    qInfo() << QString::asprintf("paintGL: width=%d, height=%d", m_config.width, m_config.height);
 
@@ -206,7 +307,7 @@ void Render::paintGL()
     m_pReader->FreePixBlock(pixblock);
 
 }
-
+*/
 void Render::resizeGL(int w, int h)
 {
 

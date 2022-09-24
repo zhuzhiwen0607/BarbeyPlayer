@@ -5,6 +5,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include "reader.h"
+#include "decoder.h"
 
 class Render : public QOpenGLWidget, public QOpenGLFunctions
 {
@@ -21,7 +22,8 @@ public:
 public:
     explicit Render(QWidget *parent = nullptr);
     ~Render();
-    bool Initialize(Config &config, Reader *reader = nullptr);
+    bool Initialize(Config &config, Reader *reader);
+    bool Initialize(Config &config, Decoder *decoder);
 
     void PixImageTest();
 
@@ -41,6 +43,7 @@ private:
     Config m_config;
 
     Reader *m_pReader;
+    Decoder *m_pDecoder;
 
     QOpenGLShaderProgram m_shaderProgram;
     GLuint m_vbo[2];

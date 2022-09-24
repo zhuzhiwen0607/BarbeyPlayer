@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_pDecoder = new Decoder;
     Decoder::Config decoderConfig = { };
+    decoderConfig.videoFrameNums = 4;
     m_pDecoder->Initialize(decoderConfig);
 
 
@@ -40,7 +41,12 @@ MainWindow::MainWindow(QWidget *parent)
     Render::Config renderConfig = { };
     renderConfig.width = 1920;
     renderConfig.height = 1080;
-    m_pRender->Initialize(renderConfig, m_pReader);
+    m_pRender->Initialize(renderConfig, m_pDecoder);
+
+    m_pDisplay = new Display;
+    m_pDisplay->Initialize();
+
+    connect(m_pDisplay, &Display::sigNewFrame, m_pRender, &Render::OnNewFrame);
 
     setCentralWidget(m_pRender);
 //    m_pRender->raise();
@@ -48,6 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 //    m_pReader->Play();
+
+    // for test begin
+    QString fileName = "E:/videos/demo_1080p.mp4";
+    m_pDecoder->OnOpen(fileName);
+    // for test end
 
 
     InitUI();
@@ -67,7 +78,7 @@ void MainWindow::OnFileOpen()
 //    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
 //    fileDialog.setWindowTitle(tr("Open Media File"));
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Media File"), "", tr("YUV Files (*.yuv)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Media File"), "", tr("Media Files (*.*)"));
 
     if (fileName.isEmpty())
         return;
