@@ -1,5 +1,10 @@
 #include "render.h"
 
+#include <QTime>
+
+static QTime g_time;
+
+
 #define VERTEX_POS 0
 #define VERTEX_TEX 1
 /*
@@ -36,6 +41,8 @@ Render::Render(QWidget *parent) : QOpenGLWidget(parent)
     memset(&m_config, 0, sizeof(m_config));
     m_pReader = nullptr;
     m_pDecoder = nullptr;
+
+    g_time.start();
 }
 
 Render::~Render()
@@ -182,7 +189,12 @@ void Render::paintGL()
 //    }
     AVFrame *pFrame = m_pDecoder->GetFilledVideoFrame();
     if (!pFrame)
+    {
+//        qInfo() << "paintGL: m_pDecoder->GetFilledVideoFrame return null";
         return;
+    }
+
+    qint64 t1 = g_time.elapsed();
 
     static QByteArray data;
     int width = pFrame->width;
@@ -238,6 +250,10 @@ void Render::paintGL()
 
 //    m_pReader->FreePixBlock(pixblock);
     m_pDecoder->FreeVideoFrame(pFrame);
+
+    qint64 t2 = g_time.elapsed();
+
+    qInfo() << "paintGL: interval t =" << (t2 - t1);
 
 }
 

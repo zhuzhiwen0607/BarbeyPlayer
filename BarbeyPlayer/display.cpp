@@ -11,10 +11,14 @@ Display::~Display()
 }
 
 //bool Display::Initialize(Decoder *decoder)
-bool Display::Initialize()
+bool Display::Initialize(Render *render)
 {
 //    if (!decoder)
 //        return;
+    if (!render)
+        return false;
+
+    m_pRender = render;
 
     moveToThread(this);
 
@@ -35,7 +39,8 @@ void Display::run()
     while (true)
     {
 //        m_pRender->OnNewFrame();
-        emit sigNewFrame();
+//        emit sigNewFrame();
+        m_pRender->OnNewFrame();
         msleep(10);
     }
 }

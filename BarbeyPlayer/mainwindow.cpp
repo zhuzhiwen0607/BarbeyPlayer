@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_pDecoder = new Decoder;
     Decoder::Config decoderConfig = { };
-    decoderConfig.videoFrameNums = 4;
+    decoderConfig.videoFrameNums = 8;
     m_pDecoder->Initialize(decoderConfig);
 
 
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_pRender->Initialize(renderConfig, m_pDecoder);
 
     m_pDisplay = new Display;
-    m_pDisplay->Initialize();
+    m_pDisplay->Initialize(m_pRender);
 
     connect(m_pDisplay, &Display::sigNewFrame, m_pRender, &Render::OnNewFrame);
 
@@ -56,7 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    m_pReader->Play();
 
     // for test begin
-    QString fileName = "E:/videos/demo_1080p.mp4";
+//    QString fileName = "E:/videos/demo_1080p.mp4";
+    QString fileName = "E:/videos/shelton.mp4";
     m_pDecoder->OnOpen(fileName);
     // for test end
 

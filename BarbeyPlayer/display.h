@@ -24,14 +24,14 @@ public:
     ~Display();
 //    bool Initialize(Decoder *decoder);
 //    bool Initialize(Render *render);
-    bool Initialize();
+    bool Initialize(Render *render);
 
 protected:
 
     virtual void run() override;
 
 private:
-//    Render *m_pRender;
+    Render *m_pRender;
 //    Decoder *m_pDecoder;
 };
 

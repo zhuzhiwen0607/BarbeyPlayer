@@ -50,6 +50,11 @@ void Decoder::FillVideoFrame(AVFrame *frame)
 
     m_freeVideoFrames.removeOne(frame);
     m_filledVideoFrames.append(frame);
+
+    if (m_filledVideoFrames.size() >= m_config.videoFrameNums)
+    {
+        qInfo() << "FillVideoFrame: m_filledVideoFrames.size =" << m_filledVideoFrames.size();
+    }
 }
 
 AVFrame* Decoder::GetFilledVideoFrame()
@@ -71,6 +76,11 @@ void Decoder::FreeVideoFrame(AVFrame *frame)
 
     m_filledVideoFrames.removeOne(frame);
     m_freeVideoFrames.append(frame);
+
+    if (m_freeVideoFrames.size() >= m_config.videoFrameNums)
+    {
+        qInfo() << "FreeVideoFrame: m_freeVideoFrames.size =" << m_freeVideoFrames.size();
+    }
 }
 
 /*
@@ -168,6 +178,10 @@ void Decoder::OnOpen(QString filename)
 
         qDebug() << QString::asprintf("streams[%d]: codecType=%d", pCodecContext->codec_type);
 
+//        av_opt_set_int(pCodecContext->priv_data, "strict", 1, 0);
+        av_opt_set(pCodecContext->priv_data, "tune", "zerolatency", 0);
+        av_opt_set(pCodecContext->priv_data, "preset", "ultrafast", 0);
+
         ret = avcodec_open2(pCodecContext, pCodec, NULL);
         if (ret < 0)
         {
@@ -210,7 +224,7 @@ void Decoder::OnOpen(QString filename)
 
     av_dump_format(m_pFormatContext, 0, inputFileName, 0);
 
-
+    qInfo() << "InitFreeVideoFrames: m_config.videoFrameNums =" << m_config.videoFrameNums;
     InitFreeVideoFrames(m_config.videoFrameNums);
 
     InitFreeAudioFrames(m_config.audioFrameNums);
@@ -249,7 +263,8 @@ void Decoder::run()
         if (m_runPlay)
             MainDecode();
 
-        msleep(10);
+        msleep(2);
+//        usleep(500);
     }
 }
 
@@ -257,19 +272,38 @@ void Decoder::MainDecode()
 {
     int ret = 0;
 
-    ret = av_read_frame(m_pFormatContext, m_pPacket);
-    if (ret == 0)
+    while (true)
     {
+        ret = av_read_frame(m_pFormatContext, m_pPacket);
+        if (ret < 0)
+        {
+            qInfo() << "av_read_frame error, ret =" << ret;
+            break;
+        }
+
         const int idx = m_pPacket->stream_index;
         StreamContext *pStreamContext = &m_streamContexts[idx];
 
         ret = avcodec_send_packet(pStreamContext->decCtx, m_pPacket);
-        if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+        if (ret == AVERROR(EAGAIN))
+        {
+//            qInfo() << "avcodec_send_packet ret is EAGAIN";
+            break;
+        }
+
+        if (AVERROR_EOF == ret)
+        {
+            qInfo() << "avcodec_send_packet ret is AVERROR_EOF";
+            break;
+        }
+
+        if (ret < 0)
         {
             qWarning() << "avcodec_send_packet error, ret =" << ret;
-            return;
+            exit(0);
         }
     }
+
 
     for (int i = 0; i < m_pFormatContext->nb_streams; ++i)
     {
@@ -288,46 +322,123 @@ void Decoder::MainDecode()
 
     }
 
+#if 0
+    ret = av_read_frame(m_pFormatContext, m_pPacket);
+    if (ret >= 0)
+    {
+        const int idx = m_pPacket->stream_index;
+        StreamContext *pStreamContext = &m_streamContexts[idx];
+
+        ret = avcodec_send_packet(pStreamContext->decCtx, m_pPacket);
+        if (ret == AVERROR(EAGAIN))
+        {
+            qInfo() << "avcodec_send_packet ret is EAGAIN";
+        }
+        else if (AVERROR_EOF == ret)
+        {
+            qInfo() << "avcodec_send_packet ret is AVERROR_EOF";
+        }
+        else if (ret < 0)
+        {
+            qWarning() << "avcodec_send_packet error, ret =" << ret;
+            exit(0);
+        }
+
+    }
+    else
+    {
+        qWarning() << "av_read_frame error" << ret;
+    }
+
+    for (int i = 0; i < m_pFormatContext->nb_streams; ++i)
+    {
+        StreamContext *pStreamContext = &m_streamContexts[i];
+
+        if (pStreamContext->mediaType == AVMEDIA_TYPE_VIDEO)
+        {
+            DecodeVideo(pStreamContext);
+        }
+        else if (pStreamContext->mediaType == AVMEDIA_TYPE_AUDIO)
+        {
+            DecodeAudio(pStreamContext);
+        }
+        else
+            ;
+
+    }
+#endif
+
 }
 
 void Decoder::DecodeVideo(StreamContext *pStreamContext)
 {
     if (!pStreamContext)
-        return;
-
-    AVFrame *pFrame = GetFreeVideoFrame();
-    if (!pFrame)
-        return;
-
-    int ret = avcodec_receive_frame(pStreamContext->decCtx, pStreamContext->frame);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
     {
+        qWarning() << "Decoder::DecodeVideo: pStreamContext is null";
         return;
     }
 
-    if (ret < 0 /*&& ret != AVERROR(EAGAIN) && ret != AVERROR_EOF*/)
+    while (true)
     {
-        qWarning() << "Decoder::DecodeVideo: avcodec_receive_frame error, ret =" << ret;
-        exit(0);
-    }
 
-    if (pStreamContext->frame->format == pFrame->format)
-    {
-        ret = av_frame_copy(pFrame, pStreamContext->frame);
-        if (ret < 0)
+        AVFrame *pFrame = GetFreeVideoFrame();
+        if (!pFrame)
         {
-            qWarning() << "Decoder::DecodeVideo: av_frame_copy error, ret =" << ret;
-            return;
+            qInfo() << "GetFreeVideoFrame return null";
+//            return;
+            break;
         }
+
+        AVFrame *frame = av_frame_alloc();
+
+//        int ret = avcodec_receive_frame(pStreamContext->decCtx, pStreamContext->frame);
+        int ret = avcodec_receive_frame(pStreamContext->decCtx, frame);
+        if (ret == AVERROR(EAGAIN))
+        {
+            qInfo() << "avcodec_receive_frame EAGAIN";
+            av_frame_free(&frame);
+//            return;
+            break;
+        }
+
+        if (ret == AVERROR_EOF)
+        {
+            qInfo() << "avcodec_receive_frame AVERROR_EOF";
+            av_frame_free(&frame);
+            break;
+        }
+
+        if (ret < 0 /*&& ret != AVERROR(EAGAIN) && ret != AVERROR_EOF*/)
+        {
+            qWarning() << "Decoder::DecodeVideo: avcodec_receive_frame error, ret =" << ret;
+            av_frame_free(&frame);
+            exit(0);
+        }
+
+        if (frame->format == pFrame->format)
+        {
+            ret = av_frame_copy(pFrame, frame);
+            if (ret < 0)
+            {
+                qWarning() << "Decoder::DecodeVideo: av_frame_copy error, ret =" << ret;
+//                return;
+                av_frame_free(&frame);
+                continue;
+            }
+        }
+        else
+        {
+
+//            sws_scale(m_pSwsContext, pStreamContext->frame->data, pStreamContext->frame->linesize, 0, pStreamContext->frame->height, pFrame->data, pFrame->linesize);
+            sws_scale(m_pSwsContext, frame->data, frame->linesize, 0, frame->height, pFrame->data, pFrame->linesize);
+        }
+
+        av_frame_free(&frame);
+
+
+        FillVideoFrame(pFrame);
+
     }
-    else
-    {
-
-        sws_scale(m_pSwsContext, pStreamContext->frame->data, pStreamContext->frame->linesize, 0, pStreamContext->frame->height, pFrame->data, pFrame->linesize);
-    }
-
-
-    FillVideoFrame(pFrame);
 
 //    emit sigNewFrame();
 
